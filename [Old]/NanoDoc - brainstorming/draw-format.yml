@@ -1,0 +1,48 @@
+
+Block.h1:
+  Column:
+    Span:   [
+    Span.i: Text
+    Span:   ].json
+
+Block.list:
+  Column:
+    Span.b: Parameters:
+    Span:   Text [
+    Span.i: text
+    Span:   ]
+
+Block.list:
+  Column:
+    Span.b: Result: 
+    Span:   Tree [
+    Span.i: json-tree
+    Span:   ]
+
+Block.h2:
+  Column:
+    Span: Case: text.length = 0
+
+Block:
+  Column:
+    Span.i: Fail
+    Span:   : “Input text is empty”
+
+Block.row.alt:
+  Column:
+    Span.b: Match: 
+    Span:   Text
+  Column.vr:
+  Column:
+    Span.b: Return
+
+Block.hr:
+
+Block.row:
+  Column:
+    Span.m: Label
+    Span:   : [
+    Span.m: Array
+  Column.vr:
+  Column:
+    Span: {Label, Array.json-array}

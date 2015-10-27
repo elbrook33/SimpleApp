@@ -1,0 +1,38 @@
+
+Style:
+  font: Palatino
+  size: 11pt
+  line: 15pt
+
+Style "b":
+  bold:
+
+Style "i":
+  italic:
+
+Style "h1":
+  size: 24pt
+  bold:
+
+Style "h2":
+  size: 18pt
+  bold:
+
+Style "list":
+  left:   1em
+  hang:   1em
+  right:  1em
+  before: •
+
+Style "row":
+  top:    7.5pt
+  bottom: 7.5pt
+
+Style "alt":
+  bg: 0.0, 0.3, 0.5, 0.1
+
+Style "hr":
+  height: 1px
+
+Style "vr":
+  width: 1px

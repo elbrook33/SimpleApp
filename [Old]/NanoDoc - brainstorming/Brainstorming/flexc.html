@@ -1,0 +1,175 @@
+<!DOCTYPE html><meta charset="utf-8">
+<html>
+<title>Flex-C: Json parser</title>
+
+<xmp theme="readable" style="display:none;">
+
+[_Text_].json
+=============
+- **Parameters:** Text [_text_]
+- **Result:** Tree [_json-tree_]
+
+Case: text.length = 0
+---------------------
+_Fail_: “Input text is empty”
+
+Case: text.length > 0
+---------------------
+
+Match: text        | Return
+------------------ | -------------------------------------
+`Label`: [`Array`  | {Label.json-item, Array.json-array}
+`Label`: {`Object` | {Label.json-item, Object.json-object}
+[`Array`           | Array.json-array/1
+{`Object`          | Object.json-object/1
+`Entry`            | Entry.json-item
+
+- - -
+
+[_Text_].json-array
+===================
+- **Parameters:** Text [_text_]
+- **Result:** Array [_json-tree_], Remainder [_text_]
+
+Match: text     | Return
+--------------- | -----------------------------------
+[`Nest`         | _Nested-array_: nest.json-array
+{`Nest`         | _Nested-array_: nest.json-object
+`Entry`] `Tail` | Entry.json-item, Tail
+`Entry`, `Tail` | Entry.json-item, Tail.json-array
+
+- - -
+
+[_Json-tree_].nested-array
+==========================
+- **Parameters:** Nest [_json-tree_], Tail [_text_]
+- **Result:** Array [_json-tree_], Remainder [_text_]
+
+Match: tail | Return
+----------- | ---------------------
+, `Next`    | Nest, Next.json-array
+] `Rest`    | Nest, Rest
+
+- - -
+
+[_Text_].json-item
+==================
+- **Parameters:** Text [_text_]
+- **Result:** Item [_text_ or _number_]
+
+Match: text | Return
+----------- | ------
+"`String`"  | String
+`Number`    | Number
+
+- - -
+
+[_Json-tree_]
+=============
+- Tree [_pair (text, json-tree)_ or _list (json-tree)_ or _text_ or _number_]
+
+- - -
+
+Preview
+=======
+
+```c
+json_tree* text__json__peek (const char* Text, const int Text__length, const int Text__size) {
+    json_tree* Tree = NULL;
+    if (Text__length == 0) {
+        Tree = fail ("Input text is empty");
+    } else if (Text__length > 0) {
+        Tree = text__text_match_text_json__peek (Text, Text__length, Text__size);
+    }
+    return Tree;
+}
+typedef struct text_match_data {
+    const char** patterns;
+    const int* pattern_lengths;
+    int* matches;
+    char*** captures; // On heap: can be returned, etc.
+    int** capture_lengths;
+    int** capture_sizes;
+    int* capture_index;
+    int* capture_word_number;
+    bool* match_deferred;
+    (json_tree* (*)(char**)* functions__grab1;
+    int n;
+} text_match_data;
+void text_match_data__init__return1__value2 (text_match_data* Data, int n) {
+    // Initialises struct for n items
+}
+void text_match_data__remove__return1__value2 (text_match_data* Data, int i) {
+    // Removes i-th item from struct
+}
+char** text_match_data__grab__return1__value2 (text_match_data* Data, int i) {
+    // Grabs i-th capture
+}
+void text_match_data__clean_up__grab1 (text_match_data* Data) {
+    // Frees memory
+}
+json_tree* text__text_match_text_json__peek (const char* Text, const int Text__length, const int Text__size) {
+    json_tree* Tree = NULL;
+    text_match_data Data;
+    text_match_data__init__return1__value2 (&Data, 5);
+    Data.patterns = {
+        "\f: [\f",
+        "\f: {\f",
+        "[\f",
+        "{\f",
+        "\f"
+    }
+    Data.pattern_lengths = {5, 5, 2, 2, 1};
+    for (char* i = Text; *i; i++) {
+        for (int j = 0; j < Data.n; j++) {
+            if (Data.match_deferred [j]) continue;
+            if (Data.patterns [Data.matches [j]] == "\f") {
+                if (*i == Data.patterns [Data.matches [j] + 1]) {
+                    Data.matches [j]++;
+                    Data.capture_word_number [j]++;
+                    Data.capture_index [j] = 0;
+                } else {
+                    Data.captures [Data.capture_word_number [j]] = *i;
+                    Data.capture_index [j]++;
+                }
+            } else {
+                if (*i == Data.patterns [Data.matches [j]]) {
+                    Data.matches [j]++;
+                    if (Data.matches [j] == Data.pattern_lengths [j]) {
+                        if (j == 0) {
+                            Tree = Data.functions__grab1 [j] (text_match_data__grab__return1__value2 (&Data, j));
+                            if (Tree != NULL) {
+                                text_match_data__clean_up__grab1 (&Data);
+                                return Tree;
+                            } else {
+                                j--;
+                            }
+                        } else {
+                            Data.match_deferred [j] = true;
+                        }
+                } else {
+                    text_match_data__remove__return1__value2 (&Data, j);
+                    j--;
+                }
+            }
+        }
+    }
+    for (int j = 0; j < Data.n; j++) {
+        if (!Data.match_deferred [j]) continue;
+        Tree = Data.functions__grab1 [j] (text_match_data__grab__return1__value2 (&Data, j));
+        if (Tree != NULL) {
+            text_match_data__clean_up__grab1 (&Data);
+            return Tree;
+        } else {
+            j--;
+        }
+    }
+    text_match_data__clean_up__grab1 (&Data);
+    return Tree;
+}
+```
+
+</xmp>
+
+<script src="http://strapdownjs.com/v/0.2/strapdown.js"></script>
+</html>
