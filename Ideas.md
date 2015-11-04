@@ -12,7 +12,7 @@ Alternatives
 ------------
 
 * I can use Cello (GC, dicts, threads, streams...), but write a syntactic sugar language and parser. Earlier, I wanted to make a whole language, including run-time. But (especially after looking at Nim) now I just want to interface with C. Like CoffeeScript. (Also, the reactive stuff is cool - but a long way off, and it's hard to read and understand how the parts fits together.)
-* Tricky: namespacing functions when chained (won't have type info without reading headers). When to drop prefix and when to not? (Probably never. Comes later, anyway. Like possibly named fields (as just dummy text). Equality operator??? A = B, A == B, A eq B, A is B.)
+* Tricky: namespacing functions when chained (won't have type info without reading headers). When to drop prefix and when to not? (Probably never. Comes later, anyway. Like possibly named fields (as just dummy text). Equality operator??? A = B, A == B, A eq B, **A is B**.)
 * All function calls need to end with : because I don't know if they're functions.
 
 ----

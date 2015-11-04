@@ -24,8 +24,8 @@
       plus
       Handle | Param.function: _
     * Boolean lists:
-      * Or this term
       + And this term
+      * Or this term
       - Not this term
     * Kebab-case (translated to underscore: Kebab_case).
     * Accessing array indices and dict fields:
@@ -39,11 +39,14 @@
       ```
       typedef enum { Alphabet, Number, Space, UpperCase, LowerCase } letter-type;
       ```
+    * Output puts function declarations at top, definitions below - no need to worry about order.
     * Function pointers:
       Function-pointer [int, char -> int]
-    * In-place functions (planned):
+    * Implicit functions:
       Radii.map: { R [double] -> Area [double] = PI*R*R } | = Areas [vec]
-    * Output puts function declarations at top, definitions below - no need to worry about order.
+    * Implicit tuples:
+      getCurrentChapter: -> Chapter [num, text, bool]
+      Num [num], Text [text], Read [bool] = getCurrentChapter:
     
     To do:
     -----
@@ -56,13 +59,14 @@
     * Functions are camelCase, types kebab-case, vars Kebab-case, and consts PascalCase.
 
 
-%include: "SimpleDict.h"
+include: "SimpleDict.h"
+include: "SnipText.h"
 
 
 parseSimpleText: Text [c-string]
 ===============
 Code [dict] = newDict:
-&Code | &Text.parseBlocks: _
+&Text.parseBlocks: &Code
 &Code.outputC:
 Code.freeFat:
 
@@ -72,9 +76,7 @@ parseBlocks: Text [c-string*], Code [dict*]
 
 do:
 --
-Blanks [text] = Text.popEmptyLines:
-Blanks | Code.addText: "blank", _
-Blanks.freeFat:
+Text.popEmptyLines: | Code.addSnippet: "blank", _
 
 while:
 -----
@@ -86,7 +88,7 @@ while:
 * Text.parseStruct: Code
 
 
-parseIncludeLine: Text [c-string*], Code [dict*] -> Success [bool]
+parseIncludeLine: Text [c-string*], Code [dict*] -> Success [Yes/No]
 ================
 
 if:
@@ -95,15 +97,8 @@ if:
 
 then:
 ----
-Include [text] = Text.popLine:
-Include.check:
-Include | Code.addText: "include", _ | check:
-Include.freeFat:
-return: true
-
-else:
-----
-return: false
+return:
++ Text.popLine: ==> Code.addSnippet: "include", _
 
 
 parseCommentLine: Text [c-string*], Code [dict*] -> Success [bool]
@@ -118,16 +113,8 @@ if:
 
 then:
 ----
-Comment [text] = Text.popLine:
-Comment.check:
-Comment.(Comment.len:) = '\0'
-Comment | Code.addText: "comment", _ + 1 | check:
-Comment.freeFat:
-return: true
-
-else:
-----
-return: false
+return:
++ Text.popLine: ==> snipEndsBy: 1, 1 ==> Code.addSnippet: "comment", _
 
 
 parseCommentBlock: Text [c-string*], Code [dict*] -> Success [bool]
@@ -171,7 +158,7 @@ else:
 return: false
 
 
-parseFunction: Text [c-string*], Code [dict*] -> Success [bool]
+parseFunction: Text [c-string*], Code [dict*] -> Success [yes or no]
 =============
 
 if:
@@ -191,10 +178,11 @@ else:
 return: false
 
 
-parseFunctionLine: Text [c-string*], Code, Scope [dict*] -> Success [bool]
+parseFunctionLine: Text [c-string*], Code, Scope [dict*] -> Success [ok?]
 =================
 
 _Scope might be used later for context awareness - e.g. abbreviating function prefixes._
+_Also for macros/generics, e.g. parse{TypeTitle}: Parameter [text] -> Result [{Type}]_
 
 return:
 * Text.parseIfBlock: Code
