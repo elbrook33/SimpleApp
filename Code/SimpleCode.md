@@ -76,7 +76,7 @@ parseBlocks: Text [c-string*], Code [dict*]
 
 do:
 --
-Text.popEmptyLines: | Code.addSnippet: "blank", _
+Text.popEmptyLines: ==> Code.addSnippet: "blank", _
 
 while:
 -----
@@ -93,36 +93,36 @@ parseIncludeLine: Text [c-string*], Code [dict*] -> Success [Yes/No]
 
 if:
 --
-+ Text.startsWith: "include: "
++ Text.startsWith("include: ")
 
 then:
 ----
 return:
-+ Text.popLine: ==> Code.addSnippet: "include", _
++ Text.popLine() => Code.addSnippet("include", _)
 
 
-parseCommentLine: Text [c-string*], Code [dict*] -> Success [bool]
+parseCommentLine: Text [memory@ of c-string], Tree [memory@ of dict] -> Success [Yes/No]
 ================
 
 if:
 --
-+ Text.startsWith: "_"
-+ Text.lineEndsWith: "_"
-+ Text, 2.nthLetterInLineHasType: NonSpace
-+ Text,-2.nthLetterInLineHasType: NonSpace
++ Text.startsWith("_")
++ Text.lineEndsWith("_")
++ Text, 2.nthLetterInLineHasType(NonSpace)
++ Text,-2.nthLetterInLineHasType(NonSpace)
 
 then:
 ----
 return:
-+ Text.popLine: ==> snipEndsBy: 1, 1 ==> Code.addSnippet: "comment", _
++ Text.popLine() => _.[text-portion].shrinkTo(2,-2) => Tree.addTextPortion("comment", _)
 
 
-parseCommentBlock: Text [c-string*], Code [dict*] -> Success [bool]
+parseCommentBlock: Text [memory@ of c-string], Code [memory@ of dict] -> Success [Yes/No]
 =================
 
 if:
 --
-+ Text.startsWithAnyOf: "  ", "\t", .
++ Text.startsWithAnyOf("  ", "\t", .)
 
 then:
 ----
@@ -130,11 +130,22 @@ Comment [text] = Text.popLine:
 Comment.check:
 Comment | Code.addText: "comment-block", _ | check:
 Comment.freeFat:
-return: true
+return: Yes
 
 else:
 ----
-return: false
+return: No
+
+__Alternatively:__
+
+if:
+--
++ Text.startsWithAnyOf("  ", "\t", .)
+
+then:
+----
+return:
++ Text.popLine() => Code.addText("comment-block", _)
 
 
 parseCBlock: Text [c-string*], Code [dict*] -> Success [bool]
